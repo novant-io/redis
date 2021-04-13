@@ -35,6 +35,9 @@ class Redis
   ** Convenience for 'invoke(["SET", key, val])'.
   Void set(Str key, Obj val) { invoke(["SET", key, val]) }
 
+  ** Convenience for 'invoke(["DEL", key])'.
+  Void del(Str key) { invoke(["DEL", key]) }
+
   ** Invoke the given command and return response.
   Obj? invoke(Str[] args)
   {

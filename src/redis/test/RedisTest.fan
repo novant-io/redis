@@ -31,6 +31,10 @@ class RedisTest : Test
     v = r.get("foo")
     echo("$v [$v.typeof]")
 
+    r.del("foo")
+    v = r.get("foo")
+    echo("? $v")
+
     echo("---")
 
     v = r.get("bar")

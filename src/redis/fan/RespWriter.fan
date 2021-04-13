@@ -18,8 +18,9 @@ internal class RespWriter
   }
 
   ** Write value to OutStream.
-  This write(Obj val)
+  This write(Obj? val)
   {
+    if (val == null) return writeNull
     if (val is List) return writeList(val)
     return writeStr(val.toStr)
   }
@@ -28,6 +29,14 @@ internal class RespWriter
   This flush()
   {
     out.flush
+    return this
+  }
+
+  ** Write a null val.
+  private This writeNull()
+  {
+    out.writeChars("\$-1")
+    writeCRLF
     return this
   }
 

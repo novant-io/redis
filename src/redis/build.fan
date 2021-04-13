@@ -16,7 +16,7 @@ class Build : build::BuildPod
       "vcs.name":     "Git",
       "vcs.uri":      "https://github.com/novant-io/redis"
     ]
-    depends = ["sys 1.0", "util 1.0", "inet 1.0", "web 1.0"]
+    depends = ["sys 1.0", "concurrent 1.0", "inet 1.0"]
     srcDirs = [`fan/`, `test/`]
     docApi  = true
     docSrc  = true

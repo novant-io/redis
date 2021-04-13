@@ -39,7 +39,7 @@ class Redis
   Void del(Str key) { invoke(["DEL", key]) }
 
   ** Invoke the given command and return response.
-  Obj? invoke(Str[] args)
+  Obj? invoke(Obj[] args)
   {
     // sanity check
     if (socket.isClosed) throw IOErr("Connection closed")
@@ -49,6 +49,21 @@ class Redis
 
     // read resp
     return RespReader(socket.in).read
+  }
+
+  ** Pipeline multiple `invoke` requests and return batched results.
+  Obj?[] pipeline(Obj[] invokes)
+  {
+    // batch writes
+    w := RespWriter(socket.out)
+    invokes.each |v| { w.write(v) }
+    w.flush
+
+    // read results
+    r := RespReader(socket.in)
+    acc := Obj?[,]
+    invokes.size.times { acc.add(r.read) }
+    return acc
   }
 
   ** Close this connection.

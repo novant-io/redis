@@ -6,8 +6,7 @@
 //   11 Apr 2021  Andy Frank  Creation
 //
 
-using util
-using web
+using concurrent
 
 *************************************************************************
 ** RedisTest
@@ -15,6 +14,59 @@ using web
 
 class RedisTest : Test
 {
+  const Int port := 5555
+  private Process? proc
+
+  ** Start local test redis-server proc.
+  Void startServer()
+  {
+    this.proc = Process {
+      it.command = ["redis-server", "--port", "${port}"]
+      it.dir = this.tempDir
+      it.out = null
+    }
+    this.proc.run
+    Actor.sleep(500ms)
+  }
+
+  ** Teardown test redis-server proc.
+  override Void teardown()
+  {
+    if (proc != null) this.proc.kill.join
+  }
+
+  ** Test basics operations against server.
+  Void testBasics()
+  {
+    startServer
+    r := Redis.open("localhost", port)
+    verifyEq(r.get("foo"), null)
+    r.set("foo", 5)
+    verifyEq(r.get("foo"), "5")
+    r.invoke(["INCRBY", "foo", 3])
+    verifyEq(r.get("foo"), "8")
+  }
+
+  ** Test basics operations against server.
+  Void testPipeline()
+  {
+    startServer
+    r := Redis.open("localhost", port)
+    v := r.pipeline([
+      ["GET",    "foo"],
+      ["SET",    "foo", 5],
+      ["GET",    "foo"],
+      ["INCRBY", "foo", 3],
+      ["GET",    "foo"],
+    ])
+    verifyEq(v.size, 5)
+    verifyEq(v[0], null)
+    verifyEq(v[1], "OK")
+    verifyEq(v[2], "5")
+    verifyEq(v[3], 8)
+    verifyEq(v[4], "8")
+  }
+
   ** RespReader parser tests.
   Void testReader()
   {

@@ -23,6 +23,7 @@ internal class RespReader
       case ':':  return readInt
       case '+':  return readSimpleStr
       case '\$': return readBulkStr
+      case '*':  return readList
       case '-':  throw IOErr(readSimpleStr)
       default:   throw IOErr("Unexpected char '${op.toChar}'")
     }
@@ -43,6 +44,15 @@ internal class RespReader
     in.read
     in.read
     return val
+  }
+
+  ** Read a list value.
+  private Obj?[] readList()
+  {
+    acc := [,]
+    len := readVal.toInt
+    len.times { acc.add(read) }
+    return acc
   }
 
   ** Read the next value up to '\r\n'. If 'eat'

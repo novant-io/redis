@@ -15,34 +15,21 @@ using web
 
 class RedisTest : Test
 {
-  Void testBasics()
+  ** RespReader parser tests.
+  Void testReader()
   {
-    r := Redis.open("localhost")
+    verifyEq(read("+OK\r\n"), "OK")
+    verifyEq(read(":5\r\n"),  5)
+    verifyEq(read("\$3\r\nfoo\r\n"),  "foo")
+    verifyEq(
+      read("*3\r\n+foo\r\n:500\r\n\$6\r\nfoobar\r\n"),
+      Obj?["foo", 500, "foobar"])
+    verifyErr(IOErr#) { read("-ERR\r\n") }
+  }
 
-    v := r.invoke(["SET", "foo", 5])
-    echo("$v [$v.typeof]")
-
-    v = r.invoke(["GET", "foo"])
-    echo("$v [$v.typeof]")
-
-    v = r.invoke(["INCRBY", "foo", 12])
-    echo("$v [$v.typeof]")
-
-    v = r.get("foo")
-    echo("$v [$v.typeof]")
-
-    r.del("foo")
-    v = r.get("foo")
-    echo("? $v")
-
-    echo("---")
-
-    v = r.get("bar")
-    echo("$v")
-
-    echo("---")
-    r.set("bar", "cool")
-    v = r.get("bar")
-    echo("$v [$v.typeof]")
+  private Obj? read(Str s)
+  {
+    buf := Buf().print(s)
+    return RespReader(buf.flip.in).read
   }
 }

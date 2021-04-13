@@ -14,10 +14,12 @@ class Build : build::BuildPod
       "org.uri":      "https://novant.io/",
       "license.name": "MIT",
       "vcs.name":     "Git",
-      "vcs.uri":      "https://github.com/novant-io/redis"
+      "vcs.uri":      "https://github.com/novant-io/redis",
+      "repo.public":  "true",
     ]
     depends = ["sys 1.0", "concurrent 1.0", "inet 1.0"]
     srcDirs = [`fan/`, `test/`]
+    resDirs = [`doc/`]
     docApi  = true
     docSrc  = true
   }

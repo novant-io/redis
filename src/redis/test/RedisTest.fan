@@ -14,32 +14,27 @@ using concurrent
 
 class RedisTest : Test
 {
-  const Int port := 5555
-  private Process? proc
+  private TestServer? server
 
   ** Start local test redis-server proc.
   Void startServer()
   {
-    this.proc = Process {
-      it.command = ["redis-server", "--port", "${port}"]
-      it.dir = this.tempDir
-      it.out = null
-    }
-    this.proc.run
+    server = TestServer()
+    server.start(this.tempDir)
     Actor.sleep(500ms)
   }
 
   ** Teardown test redis-server proc.
   override Void teardown()
   {
-    if (proc != null) this.proc.kill.join
+    server?.stop
   }
 
   ** Test basics operations against server.
   Void testBasics()
   {
     startServer
-    r := Redis.open("localhost", port)
+    r := Redis.open(server.host, server.port)
     verifyEq(r.get("foo"), null)
     r.set("foo", 5)
     verifyEq(r.get("foo"), "5")
@@ -51,7 +46,7 @@ class RedisTest : Test
   Void testPipeline()
   {
     startServer
-    r := Redis.open("localhost", port)
+    r := Redis.open(server.host, server.port)
     v := r.pipeline([
       ["GET",    "foo"],
       ["SET",    "foo", 5],

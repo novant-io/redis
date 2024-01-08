@@ -34,7 +34,7 @@ class RedisTest : Test
   Void testBasics()
   {
     startServer
-    r := Redis.open(server.host, server.port)
+    r := RedisClient(server.host, server.port)
     verifyEq(r.get("foo"), null)
     r.set("foo", 5)
     verifyEq(r.get("foo"), "5")
@@ -46,7 +46,7 @@ class RedisTest : Test
   Void testPipeline()
   {
     startServer
-    r := Redis.open(server.host, server.port)
+    r := RedisClient(server.host, server.port)
     v := r.pipeline([
       ["GET",    "foo"],
       ["SET",    "foo", 5],

@@ -34,5 +34,6 @@ internal class TestServer
   {
     if (proc != null) this.proc.kill.join
   }
+
   private Process? proc
 }

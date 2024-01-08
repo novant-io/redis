@@ -5,7 +5,7 @@ Native [Fantom]`https://fantom.org` API for [Redis]`https://redis.io`.
 
 Usage:
 
-    r := Redis.open("localhost")
+    r := RedisClient("localhost")
 
     // get/set/del conveniences
     r.set("foo", 5)

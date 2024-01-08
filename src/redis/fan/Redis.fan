@@ -16,9 +16,10 @@ class Redis
   ** Open a new Redis API client connection to given host.
   static new open(Str host, Int port := 6379)
   {
-    s := TcpSocket()
-    s.options.connectTimeout = 10sec
-    s.options.receiveTimeout = 10sec
+    s := TcpSocket(SocketConfig {
+      it.connectTimeout = 10sec
+      it.receiveTimeout = 10sec
+    })
     s.connect(IpAddr(host), port)
     return Redis(s)
   }

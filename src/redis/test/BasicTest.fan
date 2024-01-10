@@ -9,32 +9,16 @@
 using concurrent
 
 *************************************************************************
-** RedisTest
+** BasicTest
 *************************************************************************
 
-class RedisTest : Test
+class BasicTest : AbstractRedisTest
 {
-  private TestServer? server
-
-  ** Start local test redis-server proc.
-  Void startServer()
-  {
-    server = TestServer()
-    server.start(this.tempDir)
-    Actor.sleep(500ms)
-  }
-
-  ** Teardown test redis-server proc.
-  override Void teardown()
-  {
-    server?.stop
-  }
-
   ** Test basics operations against server.
   Void testBasics()
   {
     startServer
-    r := RedisClient(server.host, server.port)
+    r := makeClient
     verifyEq(r.get("foo"), null)
     r.set("foo", 5)
     verifyEq(r.get("foo"), "5")
@@ -46,7 +30,7 @@ class RedisTest : Test
   Void testPipeline()
   {
     startServer
-    r := RedisClient(server.host, server.port)
+    r := makeClient
     v := r.pipeline([
       ["GET",    "foo"],
       ["SET",    "foo", 5],

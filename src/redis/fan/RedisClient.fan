@@ -16,6 +16,11 @@ using inet
 ** Redis client.
 const class RedisClient
 {
+
+//////////////////////////////////////////////////////////////////////////
+// Lifecycle
+//////////////////////////////////////////////////////////////////////////
+
   ** Create a new client instance for given host and port.
   new make(Str host, Int port := 6379)
   {
@@ -34,6 +39,13 @@ const class RedisClient
   {
     actor.pool.stop.join
   }
+
+  ** Log instance.
+  internal const Log log := Log("redis", false)
+
+//////////////////////////////////////////////////////////////////////////
+// Redis API
+//////////////////////////////////////////////////////////////////////////
 
   ** Convenience for 'invoke(["GET", key])'.
   Str? get(Str key)
@@ -77,8 +89,23 @@ const class RedisClient
     return u.val
   }
 
-  ** Log instance.
-  internal const Log log := Log("redis", false)
+  ** Returns information about the memory usage of server.
+  Str:Obj memStats()
+  {
+    List acc := invoke(["MEMORY", "STATS"])
+    map := Str:Obj[:] { it.ordered=true }
+    for (i:=0; i<acc.size; i+=2)
+    {
+      k := acc[i]
+      v := acc[i+1]
+      map[k] = v
+    }
+    return map
+  }
+
+//////////////////////////////////////////////////////////////////////////
+// Actor
+//////////////////////////////////////////////////////////////////////////
 
   // Actor
   private const ActorPool pool := ActorPool { name="RedisClient" }

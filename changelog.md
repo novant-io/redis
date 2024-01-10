@@ -1,6 +1,7 @@
 # Changelog
 
 ## Version 0.3 (working)
+* Add `memStats` support
 
 ## Version 0.2 (8-Jan-2023)
 * Rework `Redis` -> `RedisClient` and make thread-safe

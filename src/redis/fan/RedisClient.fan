@@ -93,16 +93,30 @@ const class RedisClient
 // Hash API
 //////////////////////////////////////////////////////////////////////////
 
-  ** Get the specified hash field.
+  ** Get the hash field for given key.
   Obj? hget(Str key, Str field)
   {
     invoke(["HGET", key, field])
   }
 
-  ** Set the specified hash field to the specified value.
+  ** Get all hash field values for given key.
+  Obj?[] hgetall(Str key)
+  {
+    invoke(["HGETALL", key])
+  }
+
+  ** Set the hash field to the given value for key.
   Void hset(Str key, Str field, Obj val)
   {
     invoke(["HSET", key, field, val])
+  }
+
+  ** Set all hash values in 'vals' for given key.
+  Void hmset(Str key, Str:Obj vals)
+  {
+    acc := Obj["HMSET", key]
+    vals.each |v,k| { acc.add(k).add(v) }
+    invoke(acc)
   }
 
 //////////////////////////////////////////////////////////////////////////

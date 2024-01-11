@@ -32,7 +32,11 @@ internal class TestServer
   ** Teardown test redis-server proc.
   Void stop()
   {
-    if (proc != null) this.proc.kill.join
+    try
+    {
+      if (proc != null) this.proc.kill.join
+    }
+    catch {}
   }
 
   private Process? proc

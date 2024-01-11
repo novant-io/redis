@@ -14,38 +14,6 @@ using concurrent
 
 class BasicTest : AbstractRedisTest
 {
-  ** Test basics operations against server.
-  Void testBasics()
-  {
-    startServer
-    r := makeClient
-    verifyEq(r.get("foo"), null)
-    r.set("foo", 5)
-    verifyEq(r.get("foo"), "5")
-    r.invoke(["INCRBY", "foo", 3])
-    verifyEq(r.get("foo"), "8")
-  }
-
-  ** Test basics operations against server.
-  Void testPipeline()
-  {
-    startServer
-    r := makeClient
-    v := r.pipeline([
-      ["GET",    "foo"],
-      ["SET",    "foo", 5],
-      ["GET",    "foo"],
-      ["INCRBY", "foo", 3],
-      ["GET",    "foo"],
-    ])
-    verifyEq(v.size, 5)
-    verifyEq(v[0], null)
-    verifyEq(v[1], "OK")
-    verifyEq(v[2], "5")
-    verifyEq(v[3], 8)
-    verifyEq(v[4], "8")
-  }
-
   ** RespReader parser tests.
   Void testReader()
   {
@@ -82,5 +50,47 @@ class BasicTest : AbstractRedisTest
     buf := StrBuf()
     RespWriter(buf.out).write(obj)
     return buf.toStr
+  }
+
+  ** Test basics operations against server.
+  Void testBasics()
+  {
+    startServer
+    r := makeClient
+
+    // verify does not exist
+    verifyEq(r.get("foo"), null)
+
+    // set and verify
+    r.set("foo", 5)
+    verifyEq(r.get("foo"), "5")
+
+    // inc and verify
+    r.invoke(["INCRBY", "foo", 3])
+    verifyEq(r.get("foo"), "8")
+
+    // del and verify
+    r.del("foo")
+    verifyEq(r.get("foo"), null)
+  }
+
+  ** Test basics operations against server.
+  Void testPipeline()
+  {
+    startServer
+    r := makeClient
+    v := r.pipeline([
+      ["GET",    "foo"],
+      ["SET",    "foo", 5],
+      ["GET",    "foo"],
+      ["INCRBY", "foo", 3],
+      ["GET",    "foo"],
+    ])
+    verifyEq(v.size, 5)
+    verifyEq(v[0], null)
+    verifyEq(v[1], "OK")
+    verifyEq(v[2], "5")
+    verifyEq(v[3], 8)
+    verifyEq(v[4], "8")
   }
 }

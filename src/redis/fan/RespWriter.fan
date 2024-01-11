@@ -52,7 +52,7 @@ internal class RespWriter
   }
 
   ** Write a list.
-  private This writeList(Obj[] val)
+  private This writeList(Obj?[] val)
   {
     out.writeChar('*')
     out.writeChars(val.size.toStr)

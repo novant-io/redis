@@ -41,5 +41,10 @@ class HashTest : AbstractRedisTest
     verifyEq(a[3], "3")
     verifyEq(a[4], "c")
     verifyEq(a[5], "wagon")
+
+    // hmget
+    m := r.hmget("foo", ["a","c"])
+    verifyEq(m[0], "7")
+    verifyEq(m[1], "wagon")
   }
 }

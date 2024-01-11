@@ -99,6 +99,12 @@ const class RedisClient
     invoke(["HGET", key, field])
   }
 
+  ** Get the hash field for given key.
+  Obj?[] hmget(Str key, Str[] fields)
+  {
+    invoke(["HMGET", key].addAll(fields))
+  }
+
   ** Get all hash field values for given key.
   Obj?[] hgetall(Str key)
   {

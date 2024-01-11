@@ -1,6 +1,7 @@
 # Changelog
 
 ## Version 0.4 (working)
+* Allow `null` values on `set` as a convenience for `del`
 
 ## Version 0.3 (11-Jan-2024)
 * Add basic Hashes support: `hget`, `hmget`, `hgetall`, `hset`, `hmset`, `hdel`

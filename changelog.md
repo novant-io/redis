@@ -1,7 +1,8 @@
 # Changelog
 
 ## Version 0.3 (working)
-* Add Hashes API support
+* Add basic Hashes support: `hget`, `hmget`, `hgetall`, `hset`, `hmset`, `hdel`
+* Add `expire` and `expireAt` calls
 * Add `memStats` support
 
 ## Version 0.2 (8-Jan-2023)

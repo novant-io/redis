@@ -72,6 +72,14 @@ using concurrent
     // del and verify
     r.del("foo")
     verifyEq(r.get("foo"), null)
+
+    // set null
+    r.set("bar", null)
+    verifyEq(r.get("bar"), null)
+    r.set("bar", "xyz")
+    verifyEq(r.get("bar"), "xyz")
+    r.set("bar", null)
+    verifyEq(r.get("bar"), null)
   }
 
   ** Test expires.

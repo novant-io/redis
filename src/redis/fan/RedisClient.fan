@@ -53,10 +53,12 @@ const class RedisClient
     invoke(["GET", key])
   }
 
-  ** Set the given key to value.
-  Void set(Str key, Obj val)
+  ** Set the given key to value, if 'val' is null this method
+  ** deletes the given key (see `del`).
+  Void set(Str key, Obj? val)
   {
-    invoke(["SET", key, val])
+    if (val != null) invoke(["SET", key, val])
+    else del(key)
   }
 
   ** Delete the given key value.

@@ -90,7 +90,28 @@ const class RedisClient
   }
 
 //////////////////////////////////////////////////////////////////////////
-// Hash API
+// Expire
+//////////////////////////////////////////////////////////////////////////
+
+  ** Expire given key after given 'timeout' has elasped, where
+  ** timeout must be in even second intervals.
+  Void expire(Str key, Duration timeout)
+  {
+    sec := timeout.toSec
+    if (sec < 1) throw ArgErr("Non-zero timeout in seconds required")
+    invoke(["EXPIRE", key, sec])
+  }
+
+  ** Expire given key when the given 'timestamp' has been reached,
+  ** where 'timestamp' has a resolution of whole seconds.
+  Void expireAt(Str key, DateTime timestamp)
+  {
+    unix := timestamp.toJava / 1000
+    invoke(["EXPIREAT", key, unix])
+  }
+
+//////////////////////////////////////////////////////////////////////////
+// Hash
 //////////////////////////////////////////////////////////////////////////
 
   ** Get the hash field for given key.

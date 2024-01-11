@@ -74,6 +74,32 @@ class BasicTest : AbstractRedisTest
     verifyEq(r.get("foo"), null)
   }
 
+  ** Test expires.
+  Void testExpires()
+  {
+    startServer
+    r := makeClient
+
+    // set and expire
+    r.set("foo", 5)
+    r.expire("foo", 1500ms)
+    verifyEq(r.get("foo"), "5")
+    Actor.sleep(500ms)
+    verifyEq(r.get("foo"), "5")
+    Actor.sleep(1100ms)
+    verifyEq(r.get("foo"), null)
+
+    // set and expire at
+    at := DateTime.now + 1500ms
+    r.set("bar", 3)
+    r.expireAt("bar", at)
+    verifyEq(r.get("bar"), "3")
+    Actor.sleep(500ms)
+    verifyEq(r.get("bar"), "3")
+    Actor.sleep(1100ms)
+    verifyEq(r.get("bar"), null)
+  }
+
   ** Test basics operations against server.
   Void testPipeline()
   {

@@ -98,6 +98,20 @@ using concurrent
     verifyEq(r.get("bar"), "3")
     Actor.sleep(1100ms)
     verifyEq(r.get("bar"), null)
+
+    // set multiple
+    r.set("zar", 9)
+    r.expire("zar", 1sec)
+    Actor.sleep(500ms)
+    // extend
+    verifyEq(r.get("zar"), "9")
+    r.expire("zar", 1sec)
+    Actor.sleep(500ms)
+    // extend
+    verifyEq(r.get("zar"), "9")
+    r.expire("zar", 1sec)
+    Actor.sleep(1100ms)
+    verifyEq(r.get("zar"), null)
   }
 
   ** Test basics operations against server.

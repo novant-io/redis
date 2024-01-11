@@ -12,7 +12,7 @@ using concurrent
 ** BasicTest
 *************************************************************************
 
-class BasicTest : AbstractRedisTest
+@NoDoc class BasicTest : AbstractRedisTest
 {
   ** RespReader parser tests.
   Void testReader()

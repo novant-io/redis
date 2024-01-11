@@ -12,7 +12,7 @@ using concurrent
 ** TestServer
 *************************************************************************
 
-internal class TestServer
+@NoDoc internal class TestServer
 {
   const Str host := "localhost"
   const Int port := 5555

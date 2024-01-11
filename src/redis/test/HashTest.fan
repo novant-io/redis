@@ -12,7 +12,7 @@ using concurrent
 ** HashTest
 *************************************************************************
 
-class HashTest : AbstractRedisTest
+@NoDoc class HashTest : AbstractRedisTest
 {
   Void test()
   {

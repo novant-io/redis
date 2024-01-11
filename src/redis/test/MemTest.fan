@@ -12,7 +12,7 @@ using concurrent
 ** MemTest
 *************************************************************************
 
-class MemTest : AbstractRedisTest
+@NoDoc class MemTest : AbstractRedisTest
 {
   Void testMemStats()
   {

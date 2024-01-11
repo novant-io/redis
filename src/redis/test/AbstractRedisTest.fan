@@ -12,7 +12,7 @@ using concurrent
 ** AbstractRedisTest
 *************************************************************************
 
-abstract class AbstractRedisTest : Test
+@NoDoc abstract class AbstractRedisTest : Test
 {
   private TestServer? server
 

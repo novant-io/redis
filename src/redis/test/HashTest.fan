@@ -55,5 +55,10 @@ class HashTest : AbstractRedisTest
     verifyEq(a[1], "7")
     verifyEq(a[2], "c")
     verifyEq(a[3], "wagon")
+
+    // del entire hash
+    r.del("foo")
+    a = r.hgetall("foo")
+    verifyEq(a.size, 0)
   }
 }

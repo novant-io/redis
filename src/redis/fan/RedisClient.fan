@@ -44,22 +44,22 @@ const class RedisClient
   internal const Log log := Log("redis", false)
 
 //////////////////////////////////////////////////////////////////////////
-// Core API
+// Base API
 //////////////////////////////////////////////////////////////////////////
 
-  ** Convenience for 'invoke(["GET", key])'.
+  ** Get the value for given key.
   Str? get(Str key)
   {
     invoke(["GET", key])
   }
 
-  ** Convenience for 'invoke(["SET", key, val])'.
+  ** Set the given key to value.
   Void set(Str key, Obj val)
   {
     invoke(["SET", key, val])
   }
 
-  ** Convenience for 'invoke(["DEL", key])'.
+  ** Delete the given key value.
   Void del(Str key)
   {
     invoke(["DEL", key])

@@ -127,9 +127,19 @@ const class RedisClient
   }
 
   ** Get all hash field values for given key.
-  Str?[] hgetall(Str key)
+  Str:Str hgetall(Str key)
   {
-    invoke(["HGETALL", key])
+    map := Str:Str[:]
+    List acc := invoke(["HGETALL", key])
+
+    for (i:=0; i<acc.size; i+=2)
+    {
+      k := acc[i]
+      v := acc[i+1]
+      map[k] = v
+    }
+
+    return map
   }
 
   ** Set the hash field to the given value for key.

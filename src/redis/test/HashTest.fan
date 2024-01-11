@@ -34,13 +34,10 @@ using concurrent
 
     // hgetall
     a := r.hgetall("foo")
-    verifyEq(a.size, 6)
-    verifyEq(a[0], "a")
-    verifyEq(a[1], "7")
-    verifyEq(a[2], "b")
-    verifyEq(a[3], "3")
-    verifyEq(a[4], "c")
-    verifyEq(a[5], "wagon")
+    verifyEq(a.size, 3)
+    verifyEq(a["a"], "7")
+    verifyEq(a["b"], "3")
+    verifyEq(a["c"], "wagon")
 
     // hmget
     m := r.hmget("foo", ["a","c"])
@@ -50,11 +47,8 @@ using concurrent
     // hdel
     r.hdel("foo", "b")
     a = r.hgetall("foo")
-    verifyEq(a.size, 4)
-    verifyEq(a[0], "a")
-    verifyEq(a[1], "7")
-    verifyEq(a[2], "c")
-    verifyEq(a[3], "wagon")
+    verifyEq(a["a"], "7")
+    verifyEq(a["c"], "wagon")
 
     // del entire hash
     r.del("foo")

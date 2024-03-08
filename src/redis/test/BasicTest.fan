@@ -133,6 +133,16 @@ using concurrent
     r.expire("zar", 1sec)
     Actor.sleep(1100ms)
     verifyEq(r.get("zar"), null)
+
+    // pexpire
+    r.set("pbar", 5)
+    r.pexpire("pbar", 100ms)
+    Actor.sleep(110ms)
+    verifyEq(r.get("pbar"), null)
+
+    // errs
+    verifyErr(ArgErr#) { r.expire("xxx",  10ms) }  //  < 1sec
+    verifyErr(ArgErr#) { r.pexpire("xxx", 10ns) }  //  < 1ms
   }
 
   ** Test basics operations against server.

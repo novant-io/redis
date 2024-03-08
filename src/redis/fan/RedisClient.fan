@@ -120,6 +120,15 @@ const class RedisClient
     invoke(["EXPIREAT", key, unix])
   }
 
+  ** Expire given key after given 'timeout' has elasped, where
+  ** timeout must be in even millisecond intervals.
+  Void pexpire(Str key, Duration timeout)
+  {
+    ms := timeout.toMillis
+    if (ms < 1) throw ArgErr("Non-zero timeout in milliseconds required")
+    invoke(["PEXPIRE", key, ms])
+  }
+
 //////////////////////////////////////////////////////////////////////////
 // Hash
 //////////////////////////////////////////////////////////////////////////

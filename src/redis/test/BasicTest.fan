@@ -147,6 +147,15 @@ using concurrent
     Actor.sleep(110ms)
     verifyEq(r.get("pxfoo"), null)
 
+    // setnx px
+    r.setnx("pxbar", 10, 100ms)
+    r.setnx("pxbar", 15, 500ms)
+    verifyEq(r.get("pxbar"), "10")
+    Actor.sleep(110ms)
+    verifyEq(r.get("pxbar"), null)
+    r.setnx("pxbar", 15, 500ms)
+    verifyEq(r.get("pxbar"), "15")
+
     // errs
     verifyErr(ArgErr#) { r.expire("xxx",  10ms) }  //  < 1sec
     verifyErr(ArgErr#) { r.pexpire("xxx", 10ns) }  //  < 1ms

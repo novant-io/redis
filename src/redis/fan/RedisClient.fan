@@ -76,9 +76,16 @@ const class RedisClient
   ** 'true' if set was succesfull, or false if set failed due to
   ** already existing key.  If 'px' is non-null expire this key after
   ** the given timeout in milliseconds.
-  Bool setnx(Str key, Obj val)
+  Bool setnx(Str key, Obj val, Duration? px := null)
   {
-    invoke(["SET", key, val, "NX"]) != null
+    req := ["SET", key, val, "NX"]
+    if (px != null)
+    {
+      ms := px.toMillis
+      if (ms < 1) throw ArgErr("Non-zero timeout in milliseconds required")
+      req.add("PX").add(ms)
+    }
+    return invoke(req) != null
   }
 
   ** Delete the given key value.

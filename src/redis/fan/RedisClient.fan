@@ -61,6 +61,14 @@ const class RedisClient
     else del(key)
   }
 
+  ** Set the given key to value only if key does not exist.
+  ** Returns 'true' if set was succesfull, or false if set
+  ** failed due to already existing key.
+  Bool setnx(Str key, Obj val)
+  {
+    invoke(["SETNX", key, val]) == 1
+  }
+
   ** Delete the given key value.
   Void del(Str key)
   {

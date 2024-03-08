@@ -80,6 +80,19 @@ using concurrent
     verifyEq(r.get("bar"), "xyz")
     r.set("bar", null)
     verifyEq(r.get("bar"), null)
+
+    // setnx
+    verifyEq(r.setnx("nxa", 100), true)    // ok
+    verifyEq(r.setnx("nxb", 250), true)    // ok
+    verifyEq(r.get("nxa"), "100")
+    verifyEq(r.get("nxb"), "250")
+    // fail: exists
+    verifyEq(r.setnx("nxa", -1), false)
+    verifyEq(r.get("nxa"), "100")
+    // del and ok
+    r.del("nxa")
+    verifyEq(r.setnx("nxa", -1), true)
+    verifyEq(r.get("nxa"), "-1")
   }
 
   ** Test expires.

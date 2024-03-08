@@ -63,12 +63,7 @@ const class RedisClient
 
     // else set
     req := ["SET", key, val]
-    if (px != null)
-    {
-      ms := px.toMillis
-      if (ms < 1) throw ArgErr("Non-zero timeout in milliseconds required")
-      req.add("PX").add(ms)
-    }
+    if (px != null) req.add("PX").add(toMillis(px))
     invoke(req)
   }
 
@@ -79,12 +74,7 @@ const class RedisClient
   Bool setnx(Str key, Obj val, Duration? px := null)
   {
     req := ["SET", key, val, "NX"]
-    if (px != null)
-    {
-      ms := px.toMillis
-      if (ms < 1) throw ArgErr("Non-zero timeout in milliseconds required")
-      req.add("PX").add(ms)
-    }
+    if (px != null) req.add("PX").add(toMillis(px))
     return invoke(req) != null
   }
 
@@ -126,8 +116,7 @@ const class RedisClient
   ** timeout must be in even second intervals.
   Void expire(Str key, Duration seconds)
   {
-    sec := seconds.toSec
-    if (sec < 1) throw ArgErr("Non-zero timeout in seconds required")
+    sec := toSec(seconds)
     invoke(["EXPIRE", key, sec])
   }
 
@@ -143,8 +132,7 @@ const class RedisClient
   ** timeout must be in even millisecond intervals.
   Void pexpire(Str key, Duration milliseconds)
   {
-    ms := milliseconds.toMillis
-    if (ms < 1) throw ArgErr("Non-zero timeout in milliseconds required")
+    ms := toMillis(milliseconds)
     invoke(["PEXPIRE", key, ms])
   }
 
@@ -216,6 +204,26 @@ const class RedisClient
       map[k] = v
     }
     return map
+  }
+
+//////////////////////////////////////////////////////////////////////////
+// Support
+//////////////////////////////////////////////////////////////////////////
+
+  ** Convert duration to even millis or throw if < 1ms
+  private Int toMillis(Duration d)
+  {
+    ms := d.toMillis
+    if (ms < 1) throw ArgErr("Non-zero timeout in milliseconds required")
+    return ms
+  }
+
+  ** Convert duration to even millis or throw if < 1ms
+  private Int toSec(Duration d)
+  {
+    sec := d.toSec
+    if (sec < 1) throw ArgErr("Non-zero timeout in seconds required")
+    return sec
   }
 
 //////////////////////////////////////////////////////////////////////////

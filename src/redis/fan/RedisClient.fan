@@ -78,7 +78,7 @@ const class RedisClient
   ** the given timeout in milliseconds.
   Bool setnx(Str key, Obj val)
   {
-    invoke(["SETNX", key, val]) == 1
+    invoke(["SET", key, val, "NX"]) != null
   }
 
   ** Delete the given key value.

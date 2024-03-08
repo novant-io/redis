@@ -137,12 +137,20 @@ using concurrent
     // pexpire
     r.set("pbar", 5)
     r.pexpire("pbar", 100ms)
+    verifyEq(r.get("pbar"), "5")
     Actor.sleep(110ms)
     verifyEq(r.get("pbar"), null)
+
+    // set px
+    r.set("pxfoo", 10, 100ms)
+    verifyEq(r.get("pxfoo"), "10")
+    Actor.sleep(110ms)
+    verifyEq(r.get("pxfoo"), null)
 
     // errs
     verifyErr(ArgErr#) { r.expire("xxx",  10ms) }  //  < 1sec
     verifyErr(ArgErr#) { r.pexpire("xxx", 10ns) }  //  < 1ms
+    verifyErr(ArgErr#) { r.set("xxx", 0,  10ns) }  //  < 1ms
   }
 
   ** Test basics operations against server.

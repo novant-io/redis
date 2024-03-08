@@ -53,17 +53,29 @@ const class RedisClient
     invoke(["GET", key])
   }
 
-  ** Set the given key to value, if 'val' is null this method
-  ** deletes the given key (see `del`).
-  Void set(Str key, Obj? val)
+  ** Set the given key to value, if 'val' is null this method deletes
+  ** the given key (see `del`). If 'px' is non-null expire this key
+  ** after the given timeout in milliseconds.
+  Void set(Str key, Obj? val, Duration? px := null)
   {
-    if (val != null) invoke(["SET", key, val])
-    else del(key)
+    // delete if key 'null'
+    if (val == null) return del(key)
+
+    // else set
+    req := ["SET", key, val]
+    if (px != null)
+    {
+      ms := px.toMillis
+      if (ms < 1) throw ArgErr("Non-zero timeout in milliseconds required")
+      req.add("PX").add(ms)
+    }
+    invoke(req)
   }
 
-  ** Set the given key to value only if key does not exist.
-  ** Returns 'true' if set was succesfull, or false if set
-  ** failed due to already existing key.
+  ** Set the given key to value only if key does not exist. Returns
+  ** 'true' if set was succesfull, or false if set failed due to
+  ** already existing key.  If 'px' is non-null expire this key after
+  ** the given timeout in milliseconds.
   Bool setnx(Str key, Obj val)
   {
     invoke(["SETNX", key, val]) == 1
@@ -103,11 +115,11 @@ const class RedisClient
 // Expire
 //////////////////////////////////////////////////////////////////////////
 
-  ** Expire given key after given 'timeout' has elasped, where
+  ** Expire given key after given 'seconds' has elasped, where
   ** timeout must be in even second intervals.
-  Void expire(Str key, Duration timeout)
+  Void expire(Str key, Duration seconds)
   {
-    sec := timeout.toSec
+    sec := seconds.toSec
     if (sec < 1) throw ArgErr("Non-zero timeout in seconds required")
     invoke(["EXPIRE", key, sec])
   }
@@ -120,11 +132,11 @@ const class RedisClient
     invoke(["EXPIREAT", key, unix])
   }
 
-  ** Expire given key after given 'timeout' has elasped, where
+  ** Expire given key after given 'ms' has elasped, where
   ** timeout must be in even millisecond intervals.
-  Void pexpire(Str key, Duration timeout)
+  Void pexpire(Str key, Duration milliseconds)
   {
-    ms := timeout.toMillis
+    ms := milliseconds.toMillis
     if (ms < 1) throw ArgErr("Non-zero timeout in milliseconds required")
     invoke(["PEXPIRE", key, ms])
   }

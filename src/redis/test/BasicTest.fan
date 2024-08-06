@@ -14,6 +14,11 @@ using concurrent
 
 @NoDoc class BasicTest : AbstractRedisTest
 {
+
+//////////////////////////////////////////////////////////////////////////
+// Reader/Writer
+//////////////////////////////////////////////////////////////////////////
+
   ** RespReader parser tests.
   Void testReader()
   {
@@ -51,6 +56,10 @@ using concurrent
     RespWriter(buf.out).write(obj)
     return buf.toStr
   }
+
+//////////////////////////////////////////////////////////////////////////
+// Basics
+//////////////////////////////////////////////////////////////////////////
 
   ** Test basics operations against server.
   Void testBasics()
@@ -94,6 +103,44 @@ using concurrent
     verifyEq(r.setnx("nxa", -1), true)
     verifyEq(r.get("nxa"), "-1")
   }
+
+//////////////////////////////////////////////////////////////////////////
+// Keys
+//////////////////////////////////////////////////////////////////////////
+
+  ** Test keys.
+  Void testKeys()
+  {
+    startServer
+    r := makeClient
+
+    // programtic strings
+    verifyKey(r, "foo",     5)
+    verifyKey(r, "foo_bar", 6)
+    verifyKey(r, "foo123",  7)
+
+    // spaces
+    verifyKey(r, "foo bar",    10)
+    verifyKey(r, " foo bar  ", 11)
+    verifyKey(r, "   5",       12)
+
+    // chars
+    verifyKey(r, "Something/5 Else/1.2.3", 20)
+    verifyKey(r, "Something/5 (#55; Else/1.2.3)", 21)
+  }
+
+  private Void verifyKey(RedisClient r, Str key, Obj val)
+  {
+    r.set(key, val)
+    verifyEq(r.get(key), val.toStr)
+
+    r.hset("map", key, val)
+    verifyEq(r.hget("map", key), val.toStr)
+  }
+
+//////////////////////////////////////////////////////////////////////////
+// Expires
+//////////////////////////////////////////////////////////////////////////
 
   ** Test expires.
   Void testExpires()

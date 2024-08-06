@@ -1,5 +1,7 @@
 # Changelog
 
+## Version 0.5 (working)
+
 ## Version 0.4 (6-Aug-2024)
 * Allow `null` values on `set` as a convenience for `del`
 * Add incr support: `incr`, `incrby`, `incrbyfloat`

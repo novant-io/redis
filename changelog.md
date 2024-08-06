@@ -1,6 +1,7 @@
 # Changelog
 
 ## Version 0.5 (working)
+* Normalize all redis op methods to lowercase for consistency
 
 ## Version 0.4 (6-Aug-2024)
 * Allow `null` values on `set` as a convenience for `del`

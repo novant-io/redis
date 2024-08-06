@@ -122,7 +122,7 @@ const class RedisClient
 
   ** Expire given key when the given 'timestamp' has been reached,
   ** where 'timestamp' has a resolution of whole seconds.
-  Void expireAt(Str key, DateTime timestamp)
+  Void expireat(Str key, DateTime timestamp)
   {
     unix := timestamp.toJava / 1000
     invoke(["EXPIREAT", key, unix])

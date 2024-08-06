@@ -113,7 +113,7 @@ using concurrent
     // set and expire at
     at := DateTime.now + 1500ms
     r.set("bar", 3)
-    r.expireAt("bar", at)
+    r.expireat("bar", at)
     verifyEq(r.get("bar"), "3")
     Actor.sleep(500ms)
     verifyEq(r.get("bar"), "3")

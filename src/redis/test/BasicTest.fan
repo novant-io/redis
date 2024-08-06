@@ -162,6 +162,35 @@ using concurrent
     verifyErr(ArgErr#) { r.set("xxx", 0,  10ns) }  //  < 1ms
   }
 
+  ** Test incr ops.
+  Void testIncr()
+  {
+    startServer
+    r := makeClient
+
+    // does not exist
+    verifyEq(r.incr("a"), 1)
+    verifyEq(r.incrby("b", 5), 5)
+    verifyEq(r.incrbyfloat("c", 0.125f), 0.125f)
+    verifyEq(r.get("a"), "1")
+    verifyEq(r.get("b"), "5")
+    verifyEq(r.get("c"), "0.125")
+
+    // incr again
+    verifyEq(r.incr("a"), 2)
+    verifyEq(r.incrby("b", 3), 8)
+    verifyEq(r.incrbyfloat("c", 1.2f), 1.325f)
+    verifyEq(r.get("a"), "2")
+    verifyEq(r.get("b"), "8")
+    verify(r.get("c").toFloat.approx(1.325f))
+
+    // decr
+    verifyEq(r.incrby("b", -4), 4)
+    verifyEq(r.incrbyfloat("c", -0.025f), 1.3f)
+    verifyEq(r.get("b"), "4")
+    verify(r.get("c").toFloat.approx(1.3f))
+  }
+
   ** Test basics operations against server.
   Void testPipeline()
   {

@@ -137,6 +137,33 @@ const class RedisClient
   }
 
 //////////////////////////////////////////////////////////////////////////
+// Incr
+//////////////////////////////////////////////////////////////////////////
+
+  ** Increments the number stored at key by one. If the key does
+  ** not exist, it is set to 0 before performing the operation.
+  Int incr(Str key)
+  {
+    invoke(["INCR", key])
+  }
+
+  ** Increments the number stored at key by 'delta'. If the key
+  ** does not exist, it is set to 0 before performing the operation.
+  Int incrby(Str key, Int delta)
+  {
+    invoke(["INCRBY", key, delta])
+  }
+
+  ** Increment the string representing a floating point number
+  ** stored at 'key' by the specified 'delta'. If the key does not
+  ** exist, it is set to 0 before performing the operation.
+  Float incrbyfloat(Str key, Float delta)
+  {
+    Str res := invoke(["INCRBYFLOAT", key, delta])
+    return res.toFloat
+  }
+
+//////////////////////////////////////////////////////////////////////////
 // Hash
 //////////////////////////////////////////////////////////////////////////
 

@@ -1,7 +1,9 @@
 # Changelog
 
-## Version 0.4 (working)
+## Version 0.4 (6-Aug-2024)
 * Allow `null` values on `set` as a convenience for `del`
+* Add incr support: `incr`, `incrby`, `incrbyfloat`
+* Add hincr support: `hincr`, `hincrby`, `hincrbyfloat`
 
 ## Version 0.3 (11-Jan-2024)
 * Add basic Hashes support: `hget`, `hmget`, `hgetall`, `hset`, `hmset`, `hdel`

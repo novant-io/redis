@@ -44,6 +44,28 @@ using concurrent
     verifyEq(m[0], "7")
     verifyEq(m[1], "wagon")
 
+    // hincr does not exist
+    verifyEq(r.hincr("foo", "ia"), 1)
+    verifyEq(r.hincrby("foo", "ib", 5), 5)
+    verifyEq(r.hincrbyfloat("foo", "ic", 0.125f), 0.125f)
+    verifyEq(r.hget("foo", "ia"), "1")
+    verifyEq(r.hget("foo", "ib"), "5")
+    verifyEq(r.hget("foo", "ic"), "0.125")
+
+    // hincr exists
+    verifyEq(r.hincr("foo", "ia"), 2)
+    verifyEq(r.hincrby("foo", "ib", 3), 8)
+    verifyEq(r.hincrbyfloat("foo", "ic", 1.2f), 1.325f)
+    verifyEq(r.hget("foo", "ia"), "2")
+    verifyEq(r.hget("foo", "ib"), "8")
+    verify(r.hget("foo", "ic").toFloat.approx(1.325f))
+
+    // hincr decrement
+    verifyEq(r.hincrby("foo", "ib", -4), 4)
+    verifyEq(r.hincrbyfloat("foo", "ic", -0.025f), 1.3f)
+    verifyEq(r.hget("foo", "ib"), "4")
+    verify(r.hget("foo", "ic").toFloat.approx(1.3f))
+
     // hdel
     r.hdel("foo", "b")
     a = r.hgetall("foo")

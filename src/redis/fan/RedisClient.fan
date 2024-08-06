@@ -215,6 +215,30 @@ const class RedisClient
     invoke(["HDEL", key, field])
   }
 
+  ** Convenience for 'hincrby(key, field 1)'
+  Int hincr(Str key, Str field)
+  {
+    hincrby(key, field, 1)
+  }
+
+  ** Increments the number stored at 'field' in the hash stored at
+  ** 'key' by given 'delta'. If the field does not exist, it is set
+  ** to 0 before performing the operation.
+  Int hincrby(Str key, Str field, Int delta)
+  {
+    invoke(["HINCRBY", key, field, delta])
+  }
+
+  ** Increment the string representing a floating point number stored
+  ** at 'field' in the hash stored at 'key' by the specified 'delta'.
+  ** If the key does not exist, it is set to 0 before performing the
+  ** operation.
+  Float hincrbyfloat(Str key, Str field, Float delta)
+  {
+    Str res := invoke(["HINCRBYFLOAT", key, field, delta])
+    return res.toFloat
+  }
+
 //////////////////////////////////////////////////////////////////////////
 // Misc API
 //////////////////////////////////////////////////////////////////////////

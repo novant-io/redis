@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 0.5 (working)
+## Version 0.5 (8-Oct-2024)
 * Normalize all redis op methods to lowercase for consistency
 * Add `expires` support to: `incr`, `incrby`, `incrbyfloat`
 

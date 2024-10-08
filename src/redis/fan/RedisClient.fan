@@ -142,25 +142,65 @@ const class RedisClient
 
   ** Increments the number stored at key by one. If the key does
   ** not exist, it is set to 0 before performing the operation.
-  Int incr(Str key)
+  ** If 'px' is non-null expire this key after the given timeout
+  ** in milliseconds. Returns the value of the key after the increment.
+  Int incr(Str key, Duration? px := null)
   {
-    invoke(["INCR", key])
+    if (px == null)
+    {
+      return invoke(["INCR", key])
+    }
+    else
+    {
+      // TODO FIXIT: use MUTLI transaction
+      return pipeline([
+        ["INCR", key],
+        ["PEXPIRE", key, toMillis(px)],
+      ]).first
+    }
   }
 
   ** Increments the number stored at key by 'delta'. If the key
   ** does not exist, it is set to 0 before performing the operation.
-  Int incrby(Str key, Int delta)
+  ** If 'px' is non-null expire this key after the given timeout
+  ** in milliseconds. Returns the value of the key after the increment.
+  Int incrby(Str key, Int delta, Duration? px := null)
   {
-    invoke(["INCRBY", key, delta])
+    if (px == null)
+    {
+      return invoke(["INCRBY", key, delta])
+    }
+    else
+    {
+      // TODO FIXIT: use MUTLI transaction
+      return pipeline([
+        ["INCRBY", key, delta],
+        ["PEXPIRE", key, toMillis(px)],
+      ]).first
+    }
   }
 
   ** Increment the string representing a floating point number
   ** stored at 'key' by the specified 'delta'. If the key does not
-  ** exist, it is set to 0 before performing the operation.
-  Float incrbyfloat(Str key, Float delta)
+  ** exist, it is set to 0 before performing the operation. If 'px'
+  ** is non-null expire this key after the given timeout in
+  ** milliseconds. Returns the value of the key after the increment.
+  Float incrbyfloat(Str key, Float delta, Duration? px := null)
   {
-    Str res := invoke(["INCRBYFLOAT", key, delta])
-    return res.toFloat
+    if (px == null)
+    {
+      Str res := invoke(["INCRBYFLOAT", key, delta])
+      return res.toFloat
+    }
+    else
+    {
+      // TODO FIXIT: use MUTLI transaction
+      Str res := pipeline([
+        ["INCRBYFLOAT", key, delta],
+        ["PEXPIRE", key, toMillis(px)],
+      ]).first
+      return res.toFloat
+    }
   }
 
 //////////////////////////////////////////////////////////////////////////

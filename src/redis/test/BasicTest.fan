@@ -236,6 +236,18 @@ using concurrent
     verifyEq(r.incrbyfloat("c", -0.025f), 1.3f)
     verifyEq(r.get("b"), "4")
     verify(r.get("c").toFloat.approx(1.3f))
+
+    // incr + expr
+    verifyEq(r.incr("a", 100ms), 3)
+    verifyEq(r.incrby("b", 3, 100ms), 7)
+    verifyEq(r.incrbyfloat("c", 3.3f, 100ms), 4.6f)
+    verifyEq(r.get("a"), "3")
+    verifyEq(r.get("b"), "7")
+    verify(r.get("c").toFloat.approx(4.6f))
+    Actor.sleep(110ms)
+    verifyEq(r.get("a"), null)
+    verifyEq(r.get("b"), null)
+    verifyEq(r.get("c"), null)
   }
 
   ** Test basics operations against server.

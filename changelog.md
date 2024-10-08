@@ -2,6 +2,7 @@
 
 ## Version 0.5 (working)
 * Normalize all redis op methods to lowercase for consistency
+* Add `expires` support to: `incr`, `incrby`, `incrbyfloat`
 
 ## Version 0.4 (6-Aug-2024)
 * Allow `null` values on `set` as a convenience for `del`

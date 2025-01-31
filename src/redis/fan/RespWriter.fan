@@ -43,6 +43,10 @@ internal class RespWriter
   ** Write a bulk Str.
   private This writeStr(Str val)
   {
+    // TODO FIXIT: size is incorrect if we need to encoding
+    // non-ascii chars; we could use Str.toBuf here to fix
+    // but can we avoid the double loop?
+
     out.writeChar('\$')
     out.writeChars(val.size.toStr)
     writeCRLF

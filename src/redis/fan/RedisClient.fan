@@ -217,6 +217,64 @@ const class RedisClient
   }
 
 //////////////////////////////////////////////////////////////////////////
+// Sets
+//////////////////////////////////////////////////////////////////////////
+
+  ** Add the specified member to the set stored at key, or ignore
+  ** if this member already exists in this set. If key does not exist,
+  ** a new set is created before adding the specified members.
+  Void sadd(Str key, Obj member)
+  {
+    invoke(["SADD", key, member])
+  }
+
+  ** Add the specified members to the set stored at key. Specified
+  ** members that are already a member of this set are ignored. If
+  ** key does not exist, a new set is created before adding the
+  ** specified members.
+  Void saddAll(Str key, Obj[] members)
+  {
+    invoke(Obj["SADD", key].addAll(members))
+  }
+
+  ** Remove the specified member from the set stored at key, or do
+  ** nothing if member does not exist in this set.  If key does not
+  ** exist, this method does nothing.
+  Void srem(Str key, Obj member)
+  {
+    invoke(["SREM", key, member])
+  }
+
+  ** Remove the specified member from the set stored at key. Specified
+  ** members that are not a member of this set are ignored. If key does
+  ** not exist, this method does nothing.
+  Void sremAll(Str key, Obj[] members)
+  {
+    invoke(Obj["SREM", key].addAll(members))
+  }
+
+  ** Returns the set cardinality (number of elements) of the set
+  ** stored at key.
+  Int scard(Str key)
+  {
+    invoke(["SCARD", key])
+  }
+
+  ** Returns 'true' if member is a member of the set stored at key.
+  Bool sismember(Str key, Obj member)
+  {
+    invoke(["SISMEMBER", key, member]) == 1
+  }
+
+  ** Returns all the members of the set value stored at key.
+  Str[] smembers(Str key)
+  {
+    invoke(["SMEMBERS", key])
+  }
+
+  // `sadd`, `srem`, `scard`, `sismember`, `smembers`
+
+//////////////////////////////////////////////////////////////////////////
 // Hash
 //////////////////////////////////////////////////////////////////////////
 

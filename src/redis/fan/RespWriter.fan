@@ -43,14 +43,12 @@ internal class RespWriter
   ** Write a bulk Str.
   private This writeStr(Str val)
   {
-    // TODO FIXIT: size is incorrect if we need to encoding
-    // non-ascii chars; we could use Str.toBuf here to fix
-    // but can we avoid the double loop?
-
+    // TODO: can we optimize binary-safe write to avoid toBuf?
+    buf := val.toBuf
     out.writeChar('\$')
-    out.writeChars(val.size.toStr)
+    out.writeChars(buf.size.toStr)
     writeCRLF
-    out.writeChars(val)
+    out.writeBuf(buf)
     writeCRLF
     return this
   }

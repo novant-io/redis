@@ -38,9 +38,10 @@ internal class RespReader
   ** Read bulk string value.
   private Str? readBulkStr()
   {
+    // TODO: can we optimize binary-safe read Buf/readAll?
     len := readVal.toInt
     if (len == -1) return null
-    val := in.readChars(len)
+    val := in.readBufFully(Buf(), len).readAllStr
     in.read
     in.read
     return val

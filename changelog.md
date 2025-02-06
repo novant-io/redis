@@ -1,8 +1,11 @@
 # Changelog
 
-## Version 0.6 (working)
+## Version 0.7 (working)
+
+## Version 0.6 (6-Feb-2025)
 * Add `append`
 * Add basic Set support: `sadd`, `srem`, `scard`, `sismember`, `smembers`
+* Fix bulk strings to support binary safe read/write
 
 ## Version 0.5 (8-Oct-2024)
 * Normalize all redis op methods to lowercase for consistency

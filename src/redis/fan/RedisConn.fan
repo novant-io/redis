@@ -6,6 +6,7 @@
 //   8 Jan 2023  Andy Frank  Creation
 //
 
+using concurrent
 using inet
 
 **
@@ -58,8 +59,14 @@ internal class RedisConn
     return acc
   }
 
+  ** Return 'true if connection is closed.
+  Bool isClosed() { socket.isClosed }
+
   ** Close this connection.
   Void close() { socket.close }
+
+  ** Flag used by 'RedisConnPool' to "lock"
+  internal AtomicBool inuse := AtomicBool(false)
 
   private TcpSocket socket
 }

@@ -22,23 +22,31 @@ const class RedisClient
 //////////////////////////////////////////////////////////////////////////
 
   ** Create a new client instance for given host and port.
-  new make(Str host, Int port := 6379)
+  new make(Str host, |This|? f := null)
   {
     this.host = host
-    this.port = port
+    if (f != null) f(this)
+    this.pool = RedisConnPool(host, port, maxConns)
   }
 
   ** Host name of Redis server.
   const Str host
 
   ** Port number of Redis server.
-  const Int port
+  const Int port := 6379
+
+  ** Max number of simultaneous connections to allow before
+  ** blocking calling thread.
+  const Int maxConns := 10
 
   ** Close this client all connections if applicable.
   Void close()
   {
-    actor.pool.stop.join
+    pool.close
   }
+
+  ** Connection pool.
+  private const RedisConnPool pool
 
   ** Log instance.
   internal const Log log := Log("redis", false)
@@ -87,25 +95,13 @@ const class RedisClient
   ** Invoke the given command and return response.
   Obj? invoke(Obj[] args)
   {
-    // NOTE: we use unsafe on returns since we can guaretee the
-    // reference is not touched again; we also use Unsafe for
-    // args for performance to avoid serialization; and in _most_
-    // cases this should be fine; but it does create an edge case
-
-    Unsafe u := actor.send(RMsg('v', args)).get
-    return u.val
+    pool.exec |conn| { conn.invoke(args) }
   }
 
   ** Pipeline multiple `invoke` requests and return batched results.
   Obj?[] pipeline(Obj[] invokes)
   {
-    // NOTE: we use unsafe on returns since we can guaretee the
-    // reference is not touched again; we also use Unsafe for
-    // args for performance to avoid serialization; and in _most_
-    // cases this should be fine; but it does create an edge case
-
-    Unsafe u := actor.send(RMsg('p', invokes)).get
-    return u.val
+    pool.exec |conn| { conn.pipeline(invokes) }
   }
 
 //////////////////////////////////////////////////////////////////////////
@@ -369,6 +365,31 @@ const class RedisClient
   }
 
 //////////////////////////////////////////////////////////////////////////
+// Testing
+//////////////////////////////////////////////////////////////////////////
+
+  ** This is used for unit testing to verify connection pools.
+  internal Void _testHold(Str key, Duration hold)
+  {
+    // set and then hold conn to test pool exhastion
+    pool.exec |conn| {
+      conn.invoke(["INCR", key])
+      Actor.sleep(hold)
+      return null
+    }
+  }
+
+    ** This is used for unit testing to verify connection pools.
+  internal Void _testErr(Duration hold)
+  {
+    // simulate err to teardown connection
+    pool.exec |conn| {
+      Actor.sleep(hold)
+      throw IOErr("Test error")
+    }
+  }
+
+//////////////////////////////////////////////////////////////////////////
 // Support
 //////////////////////////////////////////////////////////////////////////
 
@@ -387,55 +408,4 @@ const class RedisClient
     if (sec < 1) throw ArgErr("Non-zero timeout in seconds required")
     return sec
   }
-
-//////////////////////////////////////////////////////////////////////////
-// Actor
-//////////////////////////////////////////////////////////////////////////
-
-  // Actor
-  private const ActorPool pool := ActorPool { name="RedisClient" }
-  private const Actor actor := Actor(pool) |msg|
-  {
-    RedisConn? c
-    try
-    {
-      c = Actor.locals["c"]
-      if (c == null) Actor.locals["c"] = c = RedisConn(host, port)
-
-      RMsg m := msg
-      switch (m.op)
-      {
-        case 'v': return Unsafe(c.invoke(m.a))
-        case 'p': return Unsafe(c.pipeline(m.a))
-        default: throw ArgErr("Unknown op '${m.op.toChar}'")
-      }
-    }
-    catch (Err err)
-    {
-      // TODO: this could be smarter; only teardown for network errs?
-      log.err("Unexpected error", err)
-      c?.close
-      Actor.locals["c"] = null
-      throw err
-    }
-    return null
-  }
-}
-
-**************************************************************************
-** RMsg
-**************************************************************************
-
-internal const class RMsg
-{
-  new make(Int op, Obj? a := null)
-  {
-    this.op = op
-    this.ua = Unsafe(a)
-  }
-
-  const Int op
-  Obj? a() { ua.val }
-
-  private const Unsafe? ua
 }

@@ -30,8 +30,11 @@ using concurrent
     server?.stop
   }
 
-  protected RedisClient makeClient()
+  protected RedisClient makeClient(Int? maxConns := null)
   {
-    RedisClient(server.host, server.port)
+    RedisClient(server.host) {
+      it.port = server.port
+      if (maxConns != null) it.maxConns = maxConns
+    }
   }
 }

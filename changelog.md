@@ -1,6 +1,9 @@
 # Changelog
 
-## Version 0.7 (working)
+## Version 0.8 (working)
+
+## Version 0.7 (17-Mon-2024)
+* Redesign to use connection pool
 
 ## Version 0.6 (6-Feb-2025)
 * Add `append`

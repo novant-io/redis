@@ -8,7 +8,7 @@ class Build : build::BuildPod
   {
     podName = "redis"
     summary = "Redis API for Fantom"
-    version = Version("0.7")
+    version = Version("0.8")
     meta = [
       "org.name":     "Novant",
       "org.uri":      "https://novant.io/",

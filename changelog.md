@@ -1,6 +1,8 @@
 # Changelog
 
-## Version 0.8 (working)
+## Version 0.8 (13-Dec-2025)
+* Add `mget`
+* Add `mset`
 
 ## Version 0.7 (17-Mon-2024)
 * Redesign to use connection pool

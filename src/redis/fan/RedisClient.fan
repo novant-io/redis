@@ -61,6 +61,13 @@ const class RedisClient
     invoke(["GET", key])
   }
 
+  ** Get the values of all specified keys, or 'null' if the a
+  ** given key does not exist or hold a string value.
+  Str?[] mget(Str[] keys)
+  {
+    invoke(["MGET"].addAll(keys))
+  }
+
   ** Set the given key to value, if 'val' is null this method deletes
   ** the given key (see `del`). If 'px' is non-null expire this key
   ** after the given timeout in milliseconds.
@@ -84,6 +91,18 @@ const class RedisClient
     req := ["SET", key, val, "NX"]
     if (px != null) req.add("PX").add(toMillis(px))
     return invoke(req) != null
+  }
+
+  ** Set multiple key values.
+  Void mset(Str:Obj vals)
+  {
+    req := Obj["MSET"]
+    vals.each |v,k|
+    {
+      req.add(k)
+      req.add(v)
+    }
+    invoke(req)
   }
 
   ** Delete the given key value.

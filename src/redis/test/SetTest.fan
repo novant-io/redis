@@ -70,4 +70,25 @@ using concurrent
     verifyEq(r.scard("foo"), 2)
     verifyEq(r.smembers("foo").sort, Obj?["b", "c"])
   }
+
+  Void testMultiple()
+  {
+    startServer
+    r := makeClient
+
+    // mset
+    r.mset(["foo":"12", "bar":"5", "zar":"quack"])
+    verifyEq(r.get("foo"), "12")
+    verifyEq(r.get("bar"), "5")
+    verifyEq(r.get("zar"), "quack")
+    verifyEq(r.mget(["foo", "bar", "zar"]), Obj?["12", "5", "quack"])
+
+    // mset
+    r.mset(["bar":"---", "zar":"wag", "x":"123"])
+    verifyEq(r.get("foo"), "12")
+    verifyEq(r.get("bar"), "---")
+    verifyEq(r.get("zar"), "wag")
+    verifyEq(r.get("x"),   "123")
+    verifyEq(r.mget(["x", "foo", "bar", "zar"]), Obj?["123", "12", "---", "wag"])
+  }
 }

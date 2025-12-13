@@ -90,5 +90,8 @@ using concurrent
     verifyEq(r.get("zar"), "wag")
     verifyEq(r.get("x"),   "123")
     verifyEq(r.mget(["x", "foo", "bar", "zar"]), Obj?["123", "12", "---", "wag"])
+
+    // mget not found
+    verifyEq(r.mget(["foo", "zzz", "zar"]), Obj?["12", null, "wag"])
   }
 }

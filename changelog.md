@@ -1,5 +1,7 @@
 # Changelog
 
+## Version 0.9 (working)
+
 ## Version 0.8 (13-Dec-2025)
 * Add `mget`
 * Add `mset`

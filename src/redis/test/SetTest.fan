@@ -93,5 +93,8 @@ using concurrent
 
     // mget not found
     verifyEq(r.mget(["foo", "zzz", "zar"]), Obj?["12", null, "wag"])
+
+    // mget empty keys
+    verifyEq(r.mget([,]), Str?[,])
   }
 }

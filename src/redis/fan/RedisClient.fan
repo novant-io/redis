@@ -65,7 +65,9 @@ const class RedisClient
   ** given key does not exist or hold a string value.
   Str?[] mget(Str[] keys)
   {
-    invoke(["MGET"].addAll(keys))
+    // short-circuit if nothing provided
+    if (keys.isEmpty) return Str?#.emptyList
+    return invoke(["MGET"].addAll(keys))
   }
 
   ** Set the given key to value, if 'val' is null this method deletes

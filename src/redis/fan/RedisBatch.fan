@@ -19,8 +19,14 @@ class RedisBatch
 {
 
 //////////////////////////////////////////////////////////////////////////
-// Identity
+// Construction
 //////////////////////////////////////////////////////////////////////////
+
+  ** It-block ctor.
+  new make(|This|? f := null)
+  {
+    if (f != null) f(this)
+  }
 
   ** Return number of commands in this batch.
   Int size() { cmds.size }

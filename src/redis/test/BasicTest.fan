@@ -298,15 +298,17 @@ using concurrent
   ** Test basics operations against server.
   Void testPipeline()
   {
+    b := RedisBatch()
+      .get("foo")
+      .set("foo", 5)
+      .get("foo")
+      .incrby("foo", 3)
+      .get("foo")
+    verifyEq(b.size, 5)
+
     startServer
     r := makeClient
-    v := r.pipeline([
-      ["GET",    "foo"],
-      ["SET",    "foo", 5],
-      ["GET",    "foo"],
-      ["INCRBY", "foo", 3],
-      ["GET",    "foo"],
-    ])
+    v := r.pipeline(b)
     verifyEq(v.size, 5)
     verifyEq(v[0], null)
     verifyEq(v[1], "OK")

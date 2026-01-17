@@ -1,6 +1,7 @@
 # Changelog
 
 ## Version 0.9 (working)
+* New `RedisBatch` API for building pipeline/multi command lists
 * Fix `mget` to handle empty keys
 * Remove `expires` param for `incr` API
 

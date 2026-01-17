@@ -1,79 +1,45 @@
 //
-// Copyright (c) 2023, Novant LLC
+// Copyright (c) 2026, Novant LLC
 // Licensed under the MIT License
 //
 // History:
-//   8 Jan 2023  Andy Frank  Creation
+//   17 Jan 2026  Andy Frank  Creation
 //
 
 using concurrent
 using inet
 
 **************************************************************************
-** RedisClient
+** RedisBatch
 **************************************************************************
 
-** Redis client.
-const class RedisClient
+** RedisBatch builds a list of commands that can be
+** run in batch using 'pipeline' or 'multi'.
+class RedisBatch
 {
 
 //////////////////////////////////////////////////////////////////////////
-// Lifecycle
+// Identity
 //////////////////////////////////////////////////////////////////////////
 
-  ** Create a new client instance for given host and port.
-  new make(Str host, |This|? f := null)
-  {
-    this.host = host
-    if (f != null) f(this)
-    this.pool = RedisConnPool(host, port, maxConns)
-  }
-
-  ** Host name of Redis server.
-  const Str host
-
-  ** Port number of Redis server.
-  const Int port := 6379
-
-  ** Max number of simultaneous connections to allow before
-  ** blocking calling thread.
-  const Int maxConns := 10
-
-  ** Close this client all connections if applicable.
-  Void close()
-  {
-    pool.close
-  }
-
-  ** Connection pool.
-  private const RedisConnPool pool
-
-  ** Log instance.
-  internal const Log log := Log("redis", false)
+  ** Return number of commands in this batch.
+  Int size() { cmds.size }
 
 //////////////////////////////////////////////////////////////////////////
 // Base API
 //////////////////////////////////////////////////////////////////////////
 
   ** Get the value for given key.
-  Str? get(Str key)
+  This get(Str key)
   {
-    invoke(["GET", key])
-  }
-
-  ** Get the values of all specified keys, or 'null' if the a
-  ** given key does not exist or hold a string value.
-  Str?[] mget(Str[] keys)
-  {
-    // short-circuit if nothing provided
-    if (keys.isEmpty) return Str?#.emptyList
-    return invoke(["MGET"].addAll(keys))
+    cmds.add(["GET", key])
+    return this
   }
 
   ** Set the given key to value, if 'val' is null this method deletes
   ** the given key (see `del`). If 'px' is non-null expire this key
   ** after the given timeout in milliseconds.
-  Void set(Str key, Obj? val, Duration? px := null)
+  This set(Str key, Obj? val, Duration? px := null)
   {
     // delete if key 'null'
     if (val == null) return del(key)
@@ -81,48 +47,27 @@ const class RedisClient
     // else set
     req := ["SET", key, val]
     if (px != null) req.add("PX").add(toMillis(px))
-    invoke(req)
+    cmds.add(req)
+    return this
   }
 
   ** Set the given key to value only if key does not exist. Returns
   ** 'true' if set was succesfull, or false if set failed due to
   ** already existing key.  If 'px' is non-null expire this key after
   ** the given timeout in milliseconds.
-  Bool setnx(Str key, Obj val, Duration? px := null)
+  This setnx(Str key, Obj val, Duration? px := null)
   {
     req := ["SET", key, val, "NX"]
     if (px != null) req.add("PX").add(toMillis(px))
-    return invoke(req) != null
-  }
-
-  ** Set multiple key values.
-  Void mset(Str:Obj vals)
-  {
-    req := Obj["MSET"]
-    vals.each |v,k|
-    {
-      req.add(k)
-      req.add(v)
-    }
-    invoke(req)
+    cmds.add(req)
+    return this
   }
 
   ** Delete the given key value.
-  Void del(Str key)
+  This del(Str key)
   {
-    invoke(["DEL", key])
-  }
-
-  ** Invoke the given command and return response.
-  Obj? invoke(Obj[] args)
-  {
-    pool.exec |conn| { conn.invoke(args) }
-  }
-
-  ** Pipeline multiple `invoke` requests and return batched results.
-  Obj?[] pipeline(RedisBatch batch)
-  {
-    pool.exec |conn| { conn.pipeline(batch.cmds) }
+    cmds.add(["DEL", key])
+    return this
   }
 
 //////////////////////////////////////////////////////////////////////////
@@ -131,26 +76,29 @@ const class RedisClient
 
   ** Expire given key after given 'seconds' has elasped, where
   ** timeout must be in even second intervals.
-  Void expire(Str key, Duration seconds)
+  This expire(Str key, Duration seconds)
   {
     sec := toSec(seconds)
-    invoke(["EXPIRE", key, sec])
+    cmds.add(["EXPIRE", key, sec])
+    return this
   }
 
   ** Expire given key when the given 'timestamp' has been reached,
   ** where 'timestamp' has a resolution of whole seconds.
-  Void expireat(Str key, DateTime timestamp)
+  This expireat(Str key, DateTime timestamp)
   {
     unix := timestamp.toJava / 1000
-    invoke(["EXPIREAT", key, unix])
+    cmds.add(["EXPIREAT", key, unix])
+    return this
   }
 
   ** Expire given key after given 'ms' has elasped, where
   ** timeout must be in even millisecond intervals.
-  Void pexpire(Str key, Duration milliseconds)
+  This pexpire(Str key, Duration milliseconds)
   {
     ms := toMillis(milliseconds)
-    invoke(["PEXPIRE", key, ms])
+    cmds.add(["PEXPIRE", key, ms])
+    return this
   }
 
 //////////////////////////////////////////////////////////////////////////
@@ -159,28 +107,33 @@ const class RedisClient
 
   ** Increments the number stored at key by one. If the key does
   ** not exist, it is set to 0 before performing the operation.
-  ** Returns the value of the key after the increment.
-  Int incr(Str key)
+  ** If 'px' is non-null expire this key after the given timeout
+  ** in milliseconds. Returns the value of the key after the increment.
+  This incr(Str key)
   {
-    invoke(["INCR", key])
+    cmds.add(["INCR", key])
+    return this
   }
 
   ** Increments the number stored at key by 'delta'. If the key
   ** does not exist, it is set to 0 before performing the operation.
-  ** Returns the value of the key after the increment.
-  Int incrby(Str key, Int delta)
+  ** If 'px' is non-null expire this key after the given timeout
+  ** in milliseconds. Returns the value of the key after the increment.
+  This incrby(Str key, Int delta)
   {
-    invoke(["INCRBY", key, delta])
+    cmds.add(["INCRBY", key, delta])
+    return this
   }
 
   ** Increment the string representing a floating point number
   ** stored at 'key' by the specified 'delta'. If the key does not
-  ** exist, it is set to 0 before performing the operation. Returns
-  ** the value of the key after the increment.
-  Float incrbyfloat(Str key, Float delta)
+  ** exist, it is set to 0 before performing the operation. If 'px'
+  ** is non-null expire this key after the given timeout in
+  ** milliseconds. Returns the value of the key after the increment.
+  This incrbyfloat(Str key, Float delta)
   {
-    Str res := invoke(["INCRBYFLOAT", key, delta])
-    return res.toFloat
+    cmds.add(["INCRBYFLOAT", key, delta])
+    return this
   }
 
 //////////////////////////////////////////////////////////////////////////
@@ -191,15 +144,17 @@ const class RedisClient
   ** the value at the end of the string. If 'key' does not exist
   ** it is created and set as an empty string, so 'append' will be
   ** similar to `set` in this special case.
-  Void append(Str key, Obj val)
+  This append(Str key, Obj val)
   {
-    invoke(["APPEND", key, val])
+    cmds.add(["APPEND", key, val])
+    return this
   }
 
 //////////////////////////////////////////////////////////////////////////
 // Sets
 //////////////////////////////////////////////////////////////////////////
 
+  /*
   ** Add the specified member to the set stored at key, or ignore
   ** if this member already exists in this set. If key does not exist,
   ** a new set is created before adding the specified members.
@@ -251,6 +206,7 @@ const class RedisClient
   {
     invoke(["SMEMBERS", key])
   }
+  */
 
   // `sadd`, `srem`, `scard`, `sismember`, `smembers`
 
@@ -258,6 +214,7 @@ const class RedisClient
 // Hash
 //////////////////////////////////////////////////////////////////////////
 
+  /*
   ** Get the hash field for given key.
   Str? hget(Str key, Str field)
   {
@@ -329,49 +286,7 @@ const class RedisClient
     Str res := invoke(["HINCRBYFLOAT", key, field, delta])
     return res.toFloat
   }
-
-//////////////////////////////////////////////////////////////////////////
-// Misc API
-//////////////////////////////////////////////////////////////////////////
-
-  ** Returns information about the memory usage of server.
-  Str:Obj memStats()
-  {
-    List acc := invoke(["MEMORY", "STATS"])
-    map := Str:Obj[:] { it.ordered=true }
-    for (i:=0; i<acc.size; i+=2)
-    {
-      k := acc[i]
-      v := acc[i+1]
-      map[k] = v
-    }
-    return map
-  }
-
-//////////////////////////////////////////////////////////////////////////
-// Testing
-//////////////////////////////////////////////////////////////////////////
-
-  ** This is used for unit testing to verify connection pools.
-  internal Void _testHold(Str key, Duration hold)
-  {
-    // set and then hold conn to test pool exhastion
-    pool.exec |conn| {
-      conn.invoke(["INCR", key])
-      Actor.sleep(hold)
-      return null
-    }
-  }
-
-    ** This is used for unit testing to verify connection pools.
-  internal Void _testErr(Duration hold)
-  {
-    // simulate err to teardown connection
-    pool.exec |conn| {
-      Actor.sleep(hold)
-      throw IOErr("Test error")
-    }
-  }
+  */
 
 //////////////////////////////////////////////////////////////////////////
 // Support
@@ -392,4 +307,10 @@ const class RedisClient
     if (sec < 1) throw ArgErr("Non-zero timeout in seconds required")
     return sec
   }
+
+//////////////////////////////////////////////////////////////////////////
+// Fields
+//////////////////////////////////////////////////////////////////////////
+
+  internal Obj[] cmds := [,]
 }

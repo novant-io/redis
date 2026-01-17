@@ -140,6 +140,7 @@ class RedisBatch
 // Append
 //////////////////////////////////////////////////////////////////////////
 
+  /*
   ** If 'key' already exists and is a string, this command appends
   ** the value at the end of the string. If 'key' does not exist
   ** it is created and set as an empty string, so 'append' will be
@@ -149,6 +150,7 @@ class RedisBatch
     cmds.add(["APPEND", key, val])
     return this
   }
+  */
 
 //////////////////////////////////////////////////////////////////////////
 // Sets

@@ -2,6 +2,7 @@
 
 ## Version 0.9 (working)
 * Fix `mget` to handle empty keys
+* Remove `expires` param for `incr` API
 
 ## Version 0.8 (13-Dec-2025)
 * Add `mget`

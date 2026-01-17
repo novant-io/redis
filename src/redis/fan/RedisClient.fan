@@ -161,40 +161,18 @@ const class RedisClient
   ** not exist, it is set to 0 before performing the operation.
   ** If 'px' is non-null expire this key after the given timeout
   ** in milliseconds. Returns the value of the key after the increment.
-  Int incr(Str key, Duration? px := null)
+  Int incr(Str key)
   {
-    if (px == null)
-    {
-      return invoke(["INCR", key])
-    }
-    else
-    {
-      // TODO FIXIT: use MUTLI transaction
-      return pipeline([
-        ["INCR", key],
-        ["PEXPIRE", key, toMillis(px)],
-      ]).first
-    }
+    invoke(["INCR", key])
   }
 
   ** Increments the number stored at key by 'delta'. If the key
   ** does not exist, it is set to 0 before performing the operation.
   ** If 'px' is non-null expire this key after the given timeout
   ** in milliseconds. Returns the value of the key after the increment.
-  Int incrby(Str key, Int delta, Duration? px := null)
+  Int incrby(Str key, Int delta)
   {
-    if (px == null)
-    {
-      return invoke(["INCRBY", key, delta])
-    }
-    else
-    {
-      // TODO FIXIT: use MUTLI transaction
-      return pipeline([
-        ["INCRBY", key, delta],
-        ["PEXPIRE", key, toMillis(px)],
-      ]).first
-    }
+    invoke(["INCRBY", key, delta])
   }
 
   ** Increment the string representing a floating point number
@@ -202,22 +180,10 @@ const class RedisClient
   ** exist, it is set to 0 before performing the operation. If 'px'
   ** is non-null expire this key after the given timeout in
   ** milliseconds. Returns the value of the key after the increment.
-  Float incrbyfloat(Str key, Float delta, Duration? px := null)
+  Float incrbyfloat(Str key, Float delta)
   {
-    if (px == null)
-    {
-      Str res := invoke(["INCRBYFLOAT", key, delta])
-      return res.toFloat
-    }
-    else
-    {
-      // TODO FIXIT: use MUTLI transaction
-      Str res := pipeline([
-        ["INCRBYFLOAT", key, delta],
-        ["PEXPIRE", key, toMillis(px)],
-      ]).first
-      return res.toFloat
-    }
+    Str res := invoke(["INCRBYFLOAT", key, delta])
+    return res.toFloat
   }
 
 //////////////////////////////////////////////////////////////////////////

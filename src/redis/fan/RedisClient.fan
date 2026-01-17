@@ -125,6 +125,13 @@ const class RedisClient
     pool.exec |conn| { conn.pipeline(batch.cmds) }
   }
 
+  ** Execute batch commands atomically in a MULTI/EXEC transaction.
+  ** Returns array of results in same order as batch commands.
+  Obj?[]? multi(RedisBatch batch)
+  {
+    pool.exec |conn| { conn.multi(batch.cmds) }
+  }
+
 //////////////////////////////////////////////////////////////////////////
 // Expire
 //////////////////////////////////////////////////////////////////////////

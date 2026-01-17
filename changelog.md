@@ -1,7 +1,8 @@
 # Changelog
 
 ## Version 0.9 (working)
-* New `RedisBatch` API for building pipeline/multi command lists
+* Add `RedisBatch` API for building pipeline/multi command lists
+* Add `RedisClient.multi` support for atomic command lists
 * Fix `mget` to handle empty keys
 * Remove `expires` param for `incr` API
 

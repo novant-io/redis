@@ -316,4 +316,30 @@ using concurrent
     verifyEq(v[3], 8)
     verifyEq(v[4], "8")
   }
+
+//////////////////////////////////////////////////////////////////////////
+// Mutli
+//////////////////////////////////////////////////////////////////////////
+
+  ** Test basics operations against server.
+  Void testMulti()
+  {
+    b := RedisBatch()
+      .get("foo")
+      .set("foo", 5)
+      .get("foo")
+      .incrby("foo", 3)
+      .get("foo")
+    verifyEq(b.size, 5)
+
+    startServer
+    r := makeClient
+    v := r.multi(b)
+    verifyEq(v.size, 5)
+    verifyEq(v[0], null)
+    verifyEq(v[1], "OK")
+    verifyEq(v[2], "5")
+    verifyEq(v[3], 8)
+    verifyEq(v[4], "8")
+  }
 }

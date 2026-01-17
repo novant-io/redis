@@ -47,6 +47,9 @@ internal class RedisConn
   ** Pipeline multiple `invoke` requests and return batched results.
   Obj?[] pipeline(Obj[] invokes)
   {
+    // sanity check
+    if (socket.isClosed) throw IOErr("Connection closed")
+
     // batch writes
     w := RespWriter(socket.out)
     invokes.each |v| { w.write(v) }
@@ -57,6 +60,36 @@ internal class RedisConn
     acc := Obj?[,]
     invokes.size.times { acc.add(r.read) }
     return acc
+  }
+
+  ** Execute commands atomically in a MULTI/EXEC transaction.
+  Obj?[] multi(Obj[] invokes)
+  {
+    // sanity check
+    if (socket.isClosed) throw IOErr("Connection closed")
+
+    w := RespWriter(socket.out)
+    r := RespReader(socket.in)
+
+    // send MULTI
+    w.write(["MULTI"]).flush
+    res := r.read
+    if (res != "OK") throw IOErr("MULTI failed: $res")
+
+    // queue all commands
+    invokes.each |v| { w.write(v) }
+    w.flush
+
+    // read QUEUED responses (discard)
+    invokes.size.times |i|
+    {
+      qres := r.read
+      if (qres != "QUEUED") throw IOErr("Command $i not queued: $qres")
+    }
+
+    // send EXEC and return results array
+    w.write(["EXEC"]).flush
+    return r.read
   }
 
   ** Return 'true if connection is closed.

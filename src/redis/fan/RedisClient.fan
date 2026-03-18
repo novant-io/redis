@@ -360,6 +360,23 @@ const class RedisClient
       invoke(["LPUSH", key, val])
   }
 
+  **
+  ** Insert all the specified values at the tail of the list stored
+  ** at key. If key does not exist, it is created as empty list before
+  ** performing the push operation. When key holds a value that is not
+  ** a list, throws Err.
+  **
+  ** Val may be a single value or a 'List' of values. When a 'List' is
+  ** passed, all values are pushed in a single command.
+  **
+  Void rpush(Str key, Obj val)
+  {
+    if (val is List)
+      invoke(Obj["RPUSH", key].addAll(val))
+    else
+      invoke(["RPUSH", key, val])
+  }
+
   ** Return the length of the list stored at key. If key does not
   ** exist, it is interpreted as an empty list and 0 is returned.
   Int llen(Str key)

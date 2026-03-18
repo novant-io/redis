@@ -53,5 +53,13 @@ using concurrent
     r.ltrim("foo", 1, 2)
     verifyEq(r.llen("foo"), 2)
     verifyEq(r.lrange("foo"), Obj?["5", "b"])
+
+    // rpush
+    r.rpush("foo", 7)
+    verifyEq(r.llen("foo"), 3)
+    verifyEq(r.lrange("foo"), Obj?["5", "b", "7"])
+    r.rpush("foo", [8,9,10])
+    verifyEq(r.llen("foo"), 6)
+    verifyEq(r.lrange("foo"), Obj?["5", "b", "7", "8", "9", "10"])
   }
 }

@@ -3,6 +3,7 @@
 ## Version 0.10 (working)
 * Add `RedisBatch.each` iterator
 * Add `RedisBatch` it-block ctor
+* Add `RedisClient` list commands: `lpush`, `lrange`, `ltrim`, `llen`
 
 ## Version 0.9 (17-Jan-2025)
 * Add `RedisBatch` API for building pipeline/multi command lists

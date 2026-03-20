@@ -130,4 +130,60 @@ using concurrent
     verifyEq(r.get("e"), "5.25")
     verifyEq(r.get("f"), "0.25")
   }
+
+//////////////////////////////////////////////////////////////////////////
+// Lists
+//////////////////////////////////////////////////////////////////////////
+
+  Void testLists()
+  {
+    startServer
+    r := makeClient
+
+    // lpush adds to head, rpush adds to tail
+    b := RedisBatch()
+      .lpush("foo", "c")
+      .lpush("foo", "b")
+      .lpush("foo", "a")
+      .rpush("foo", "d")
+      .rpush("foo", "e")
+    v := r.pipeline(b)
+    verifyEq(v.size, b.size)
+
+    // list should be [a, b, c, d, e]
+    all := r.lrange("foo", 0, -1)
+    verifyEq(all.size, 5)
+    verifyEq(all[0], "a")
+    verifyEq(all[1], "b")
+    verifyEq(all[2], "c")
+    verifyEq(all[3], "d")
+    verifyEq(all[4], "e")
+
+    // lrange subset
+    sub := r.lrange("foo", 1, 3)
+    verifyEq(sub.size, 3)
+    verifyEq(sub[0], "b")
+    verifyEq(sub[1], "c")
+    verifyEq(sub[2], "d")
+
+    // ltrim to keep first 3
+    r.ltrim("foo", 0, 2)
+    trimmed := r.lrange("foo", 0, -1)
+    verifyEq(trimmed.size, 3)
+    verifyEq(trimmed[0], "a")
+    verifyEq(trimmed[1], "b")
+    verifyEq(trimmed[2], "c")
+
+    // batch lpush + ltrim (capped list pattern)
+    b2 := RedisBatch()
+      .lpush("capped", "x")
+      .lpush("capped", "y")
+      .lpush("capped", "z")
+      .ltrim("capped", 0, 1)
+    r.pipeline(b2)
+    capped := r.lrange("capped", 0, -1)
+    verifyEq(capped.size, 2)
+    verifyEq(capped[0], "z")
+    verifyEq(capped[1], "y")
+  }
 }

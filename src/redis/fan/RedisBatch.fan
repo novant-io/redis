@@ -300,6 +300,75 @@ class RedisBatch
   */
 
 //////////////////////////////////////////////////////////////////////////
+// Lists
+//////////////////////////////////////////////////////////////////////////
+
+  **
+  ** Insert all the specified values at the head of the list stored
+  ** at key. If key does not exist, it is created as empty list before
+  ** performing the push operations. When key holds a value that is not
+  ** a list, throws Err.
+  **
+  ** Val may be a single value or a 'List' of values. When a 'List' is
+  ** passed, all values are pushed in a single command. Note that values
+  ** are pushed left-to-right, so 'lpush(key, [1,2,3])' results in '3'
+  ** at the head.
+  **
+  This lpush(Str key, Obj val)
+  {
+    if (val is List)
+      cmds.add(Obj["LPUSH", key].addAll(val))
+    else
+      cmds.add(["LPUSH", key, val])
+    return this
+  }
+
+  **
+  ** Insert all the specified values at the tail of the list stored
+  ** at key. If key does not exist, it is created as empty list before
+  ** performing the push operation. When key holds a value that is not
+  ** a list, throws Err.
+  **
+  ** Val may be a single value or a 'List' of values. When a 'List' is
+  ** passed, all values are pushed in a single command.
+  **
+  This rpush(Str key, Obj val)
+  {
+    if (val is List)
+      cmds.add(Obj["RPUSH", key].addAll(val))
+    else
+      cmds.add(["RPUSH", key, val])
+    return this
+  }
+
+  ** Return the length of the list stored at key. If key does not
+  ** exist, it is interpreted as an empty list and 0 is returned.
+  This llen(Str key)
+  {
+    cmds.add(["LLEN", key])
+    return this
+  }
+
+  ** Return the specified range of elements from the list stored at
+  ** 'key'. Both 'start' and 'stop' are zero-based indexes. Use 0 and
+  ** -1 to retrieve the entire list.
+  This lrange(Str key, Int start := 0, Int stop := -1)
+  {
+    cmds.add(["LRANGE", key, start, stop])
+    return this
+  }
+
+  ** Trim an existing list so that it will contain only the specified
+  ** range of elements specified. Both 'start' and 'stop' are zero-based
+  ** indexes, where 0 is the first element of the list (the head), 1
+  ** the next element and so on.
+  This ltrim(Str key, Int start, Int stop)
+  {
+    cmds.add(["LTRIM", key, start, stop])
+    return this
+  }
+
+//////////////////////////////////////////////////////////////////////////
 // Support
 //////////////////////////////////////////////////////////////////////////
 

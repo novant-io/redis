@@ -1,6 +1,8 @@
 # Changelog
 
-## Version 0.10 (working)
+## Version 0.11 (working)
+
+## Version 0.10 (24-Jan-2025)
 * Add `RedisBatch.each` iterator
 * Add `RedisBatch` it-block ctor
 * Add `RedisClient` list commands: `lpush`, `rpush`, `lrange`, `ltrim`, `llen`

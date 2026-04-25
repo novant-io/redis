@@ -39,6 +39,9 @@ const class RedisClient
   ** blocking calling thread.
   const Int maxConns := 10
 
+  ** Connection pool statistics.
+  RedisPoolStats poolStats() { pool.stats }
+
   ** Close this client all connections if applicable.
   Void close()
   {

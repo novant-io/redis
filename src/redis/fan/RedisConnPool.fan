@@ -17,12 +17,16 @@ internal const class RedisConnPool
   ** Constructor.
   new make(Str host, Int port, Int maxConns)
   {
-    this.host = host
-    this.port = port
+    this.host     = host
+    this.port     = port
     this.maxConns = maxConns
-    this.lock = Lock.makeReentrant
-    this.map  = ConcurrentMap()
+    this.lock     = Lock.makeReentrant
+    this.map      = ConcurrentMap()
+    this.stats    = RedisPoolStats()
   }
+
+  ** Pool statistics.
+  const RedisPoolStats stats
 
   ** Allocate a 'RedisConn' inside and pass to given function,
   ** where the connection is released when func completes.
@@ -60,11 +64,12 @@ internal const class RedisConnPool
   {
     // start before we try to aquire lock to include
     // that time with waiting for an open connection
-    start := Duration.now
+    start := Duration.nowTicks
+    timeoutTicks := timeout.ticks
     return doLock(timeout) |->Obj?|
     {
       // loop until conn found or timeout is reached
-      while (Duration.now - start < timeout)
+      while (Duration.nowTicks - start < timeoutTicks)
       {
         for (i:=0; i<maxConns; i++)
         {
@@ -88,6 +93,7 @@ internal const class RedisConnPool
           if (!c.inuse.val)
           {
             c.inuse.val = true
+            stats.onAcquire(Duration.nowTicks - start)
             return c
           }
         }
@@ -97,6 +103,7 @@ internal const class RedisConnPool
       }
 
       // bail with timeout
+      stats.onAcquireTimeout
       throw errTimeout
     }
   }
@@ -106,6 +113,7 @@ internal const class RedisConnPool
   {
     // release outside of lock
     conn.inuse.val = false
+    stats.onRelease
   }
 
   ** Evalute callback inside lock.

@@ -1,6 +1,7 @@
 # Changelog
 
 ## Version 0.11 (working)
+* Add `RedisPoolStats` API
 
 ## Version 0.10 (24-Jan-2025)
 * Add `RedisBatch.each` iterator
